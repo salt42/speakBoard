@@ -1,0 +1,75 @@
+<html>
+    <head>
+        <title>Speak Board Config</title>
+    </head>
+    <style>
+
+    </style>
+    <body>
+        <form method = "POST" action = "/upload" enctype="multipart/form-data">
+            Mp3: <input type="file" name="data"/><br>
+            Button: <input type="number" value="-1" name="button"><br>
+            <input type="submit" name="upload" value="Upload" title = "Upload Files">
+        </form>	
+        
+        <ul id="file-list">
+        </ul>
+        <script>
+            let wifiList = $("#file-list");
+
+            // let res = [{rssi: -42, ssid: "test"}]
+            // for (const net of res) {
+            //     let d = createElement(`<li data-ssid="${net.ssid}">&nbsp;
+            //         <span class="ssid">${net.ssid}</span>  <span class="signal">${net.rssi}</span>
+            //     </li>`);
+            //     wifiList.append(d);
+            // }
+
+            $("#wifi-list").addEventListener("click", (e) => {
+                $("#i-ssid").value = e.target.dataset.ssid;
+            })
+            
+            function scanWifi() {
+                getJSON("/scan", (err, res) => {
+                    wifiList.innerHTML = "";
+                    console.log(res);
+                    for (const net of res) {
+                        // rssi
+                        // ssid
+                        // bssid
+                        // channel
+                        // secure  int
+                        
+                        let d = createElement(`
+                            <li data-ssid="${net.ssid}">&nbsp;
+                                <span class="ssid">${net.ssid}</span>  <span class="signal">${net.rssi}</span>
+                            </li>`
+                        );
+                        wifiList.append(d);
+                    }
+                })
+            }
+            function createElement(domstring) {
+                const html = new DOMParser().parseFromString(domstring, 'text/html');
+                return html.body.firstChild;
+            };
+            function $(selector) {
+                return document.querySelector(selector);
+            }
+            function getJSON(url, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'json';
+                xhr.onload = function() {
+                    var status = xhr.status;
+                    if (status === 200) {
+                        callback(null, xhr.response);
+                    } else {
+                        callback(status, xhr.response);
+                    }
+                }
+                xhr.send();
+            };
+        </script>
+    </body>
+</html>

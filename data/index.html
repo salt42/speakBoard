@@ -1,0 +1,109 @@
+<html>
+    <head>
+        <title>Cat Controller Network Config</title>
+    </head>
+    <style>
+        #wifi-list {
+            list-style: none;
+            padding: 0;
+        }
+        #wifi-list li{
+            font-size: 20px;
+            /* background-color: #ffe37f; */
+            margin-bottom: 5px;
+            height: 50px;
+            padding: 3px 6px 3px 6px;
+        }
+        #wifi-list .ssid {
+            float: left;
+        }
+        #wifi-list .signal {
+            float: right;
+        }
+        #wifi-list li:nth-child(even) {
+            background-color: #ffe37f;
+        }
+
+        #wifi-list li:nth-child(odd) {
+            background-color: #19dc3c;
+        }
+    </style>
+    <body>
+        <h1>Sers</h1>
+        <form method="POST" action="save">
+            <label>SSID:
+                <input id="i-ssid" name="ssid" type="text"/>
+            </label>
+            <br>
+            <br>
+            <label>Key:
+                <input id="i-key" name="key" type="text"/>
+            </label>
+            <br>
+            <br>
+            <input type="submit" value="SAVE">
+        </form>
+        Scanned Networks: <button onclick="scanWifi()">RESCANN</button>
+        <ul id="wifi-list">
+        </ul>
+        <script>
+            let wifiList = $("#wifi-list");
+            
+            scanWifi();
+
+            // let res = [{rssi: -42, ssid: "test"}]
+            // for (const net of res) {
+            //     let d = createElement(`<li data-ssid="${net.ssid}">&nbsp;
+            //         <span class="ssid">${net.ssid}</span>  <span class="signal">${net.rssi}</span>
+            //     </li>`);
+            //     wifiList.append(d);
+            // }
+
+            $("#wifi-list").addEventListener("click", (e) => {
+                $("#i-ssid").value = e.target.dataset.ssid;
+            })
+            
+            function scanWifi() {
+                getJSON("/scan", (err, res) => {
+                    wifiList.innerHTML = "";
+                    console.log(res);
+                    for (const net of res) {
+                        // rssi
+                        // ssid
+                        // bssid
+                        // channel
+                        // secure  int
+                        
+                        let d = createElement(`
+                            <li data-ssid="${net.ssid}">&nbsp;
+                                <span class="ssid">${net.ssid}</span>  <span class="signal">${net.rssi}</span>
+                            </li>`
+                        );
+                        wifiList.append(d);
+                    }
+                })
+            }
+            function createElement(domstring) {
+                const html = new DOMParser().parseFromString(domstring, 'text/html');
+                return html.body.firstChild;
+            };
+            function $(selector) {
+                return document.querySelector(selector);
+            }
+            function getJSON(url, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.responseType = 'json';
+                xhr.onload = function() {
+                    var status = xhr.status;
+                    if (status === 200) {
+                        callback(null, xhr.response);
+                    } else {
+                        callback(status, xhr.response);
+                    }
+                }
+                xhr.send();
+            };
+        </script>
+    </body>
+</html>
